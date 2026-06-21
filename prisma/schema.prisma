@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // Supabase pooled vs direct connection
+}
+
+model User {
+  id        String    @id @default(cuid())
+  clerkId   String    @unique
+  email     String    @unique
+  name      String?
+  projects  Project[]
+  createdAt DateTime  @default(now())
+}
+
+model Project {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  owner       User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     String
+  source      InputType    @default(MANUAL)
+  prompt      String?
+  topology    Topology?
+  plan        NetworkPlan?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Topology {
+  id          String       @id @default(cuid())
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId   String       @unique
+  devices     Device[]
+  connections Connection[]
+  layout      Json?
+}
+
+model Device {
+  id         String       @id @default(cuid())
+  topology   Topology     @relation(fields: [topologyId], references: [id], onDelete: Cascade)
+  topologyId String
+  label      String
+  type       DeviceType
+  meta       Json?
+  fromLinks  Connection[] @relation("from")
+  toLinks    Connection[] @relation("to")
+}
+
+model Connection {
+  id         String   @id @default(cuid())
+  topology   Topology @relation(fields: [topologyId], references: [id], onDelete: Cascade)
+  topologyId String
+  from       Device   @relation("from", fields: [fromId], references: [id])
+  fromId     String
+  to         Device   @relation("to", fields: [toId], references: [id])
+  toId       String
+  meta       Json?
+}
+
+model NetworkPlan {
+  id        String  @id @default(cuid())
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String  @unique
+  ipPlan    Json
+  vlanPlan  Json
+  routing   Json
+  notes     Json?
+}
+
+enum InputType {
+  PROMPT
+  IMAGE
+  MANUAL
+}
+
+enum DeviceType {
+  ROUTER
+  SWITCH
+  SERVER
+  PC
+  FIREWALL
+  AP
+}
