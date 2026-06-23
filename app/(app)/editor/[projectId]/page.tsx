@@ -12,6 +12,7 @@ import type { BuiltTopology, Device, DeviceType } from "@/lib/network-engine/typ
 
 const PREFIX: Record<DeviceType, string> = {
   ROUTER: "R", SWITCH: "SW", SERVER: "SRV", PC: "PC", FIREWALL: "FW", AP: "AP",
+  PRINTER: "PRN", CAMERA: "CAM", NVR: "NVR", IP_PHONE: "PH",
 };
 
 export default function EditorPage() {
