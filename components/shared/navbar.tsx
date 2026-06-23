@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 
 export function Navbar() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur">
-      <div className="container flex h-16 items-center justify-between">
+    <header className="sticky top-0 z-40 w-full border-b bg-background/70 backdrop-blur-xl">
+      <div className="container flex h-16 items-center justify-between gap-4">
         <Logo />
-        <nav className="flex items-center gap-2">
+        <nav className="flex items-center gap-1.5">
           <ThemeToggle />
           <SignedOut>
             <Button asChild variant="ghost">
@@ -21,9 +21,6 @@ export function Navbar() {
             </Button>
           </SignedOut>
           <SignedIn>
-            <Button asChild variant="ghost">
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
             <UserButton afterSignOutUrl="/" />
           </SignedIn>
         </nav>
