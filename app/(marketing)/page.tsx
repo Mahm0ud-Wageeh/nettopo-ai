@@ -144,20 +144,17 @@ export default function LandingPage() {
                       if (!requireAuth()) return;
                       setText(e.target.value);
                     }}
-                    placeholder="E.g., Design a high-availability spine-leaf data center fabric with BGP EVPN for 4 server racks..."
+                    placeholder="Describ..."
                     className="resize-none border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
                   />
-                  <div className="mt-2 flex items-center justify-between gap-3">
-                    <Button
-                      asChild
-                      variant="outline"
-                      size="sm"
-                      className="gap-2"
-                    >
-                      <Link href="/upload">
-                        <Upload className="h-4 w-4" /> Upload Topology Image
-                      </Link>
-                    </Button>
+                  <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+                    <Button asChild variant="outline" size="sm" className="gap-2">
+                        <Button asChild variant="outline" size="icon" aria-label="Upload topology image" title="Upload topology image">
+                              <Link href="/upload">
+                              <Upload className="h-4 w-4" /> 
+                             </Link>
+                        </Button>
+                     </Button>
                     <Button
                       onClick={generate}
                       disabled={loading}

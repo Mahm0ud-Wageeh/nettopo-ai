@@ -36,22 +36,23 @@ export function WorkspaceTopbar({
   saving?: boolean;
 }) {
   return (
-    <header className="flex h-14 shrink-0 items-center gap-6 border-b bg-background/80 px-4 backdrop-blur-xl">
+    <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background/80 px-3 backdrop-blur-xl sm:gap-6 sm:px-4">
       <Logo />
-      <nav className="flex items-center gap-1">
+      <nav className="flex items-center gap-0.5 overflow-x-auto sm:gap-1">
         {TABS.map((t) => (
           <button
             key={t.id}
             type="button"
             onClick={() => onView(t.id)}
             className={cn(
-              "relative flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors",
+              "relative flex shrink-0 items-center gap-1.5 whitespace-nowrap px-2.5 py-1.5 text-sm font-medium transition-colors sm:px-3",
               view === t.id
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            <t.icon className="h-4 w-4" /> {t.label}
+            <t.icon className="h-4 w-4" />{" "}
+            <span className="hidden sm:inline">{t.label}</span>
             {view === t.id && (
               <span className="absolute inset-x-2 -bottom-[15px] h-0.5 rounded-full bg-primary" />
             )}

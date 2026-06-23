@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   AlertTriangle,
+  ChevronUp,
   CheckCircle2,
   Copy,
   Download,
@@ -110,6 +111,7 @@ export default function ResultPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [resolved, setResolved] = useState<Set<string>>(new Set());
   const [showDiff, setShowDiff] = useState(true);
+  const [inspectorOpen, setInspectorOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -192,7 +194,10 @@ export default function ResultPage() {
 
   const handleSelect = (id: string | null) => {
     setSelectedId(id);
-    if (id) setTab("overview");
+    if (id) {
+      setTab("overview");
+      setInspectorOpen(true);
+    }
   };
   const onDownloadCisco = () =>
     cisco && downloadText("nettopo-cisco-config.txt", cisco.combined);
@@ -256,7 +261,7 @@ export default function ResultPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-[100dvh] flex-col">
       <WorkspaceTopbar
         view={wsView}
         onView={setWsView}
@@ -264,8 +269,8 @@ export default function ResultPage() {
         saving={saving}
       />
 
-      <div className="flex min-h-0 flex-1">
-        <section className="relative min-w-0 flex-1">
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+        <section className="relative min-h-0 min-w-0 flex-1">
           {wsView === "network" && (
             <TopologyBoard
               topology={topology}
@@ -302,8 +307,17 @@ export default function ResultPage() {
         </section>
 
         {wsView === "network" && (
-          <aside className="flex w-[400px] shrink-0 flex-col border-l bg-card">
-            <div className="flex items-center justify-between gap-2 border-b px-4 py-3">
+          <aside
+            className={cn(
+              "flex w-full shrink-0 flex-col border-t bg-card lg:w-[400px] lg:border-l lg:border-t-0",
+              inspectorOpen ? "max-h-[65vh] lg:max-h-none" : "",
+            )}
+          >
+            <button
+              type="button"
+              onClick={() => setInspectorOpen((o) => !o)}
+              className="flex w-full items-center justify-between gap-2 border-b px-4 py-3 text-left lg:pointer-events-none"
+            >
               <div className="min-w-0">
                 <h2 className="truncate font-display text-lg font-bold leading-tight">
                   {selectedDevice ? selectedDevice.label : "Network overview"}
@@ -314,18 +328,32 @@ export default function ResultPage() {
                     : `${topology.devices.length} devices`}
                 </p>
               </div>
-              {scopeIssues.length > 0 ? (
-                <Badge variant="ai" className="gap-1">
-                  <AlertTriangle className="h-3 w-3" /> WARNING
-                </Badge>
-              ) : (
-                <Badge variant="secondary" className="gap-1">
-                  <CheckCircle2 className="h-3 w-3" /> HEALTHY
-                </Badge>
-              )}
-            </div>
+              <div className="flex items-center gap-2">
+                {scopeIssues.length > 0 ? (
+                  <Badge variant="ai" className="gap-1">
+                    <AlertTriangle className="h-3 w-3" /> WARNING
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary" className="gap-1">
+                    <CheckCircle2 className="h-3 w-3" /> HEALTHY
+                  </Badge>
+                )}
+                <ChevronUp
+                  className={cn(
+                    "h-4 w-4 shrink-0 text-muted-foreground transition-transform lg:hidden",
+                    inspectorOpen ? "" : "rotate-180",
+                  )}
+                />
+              </div>
+            </button>
 
-            <div className="flex items-center gap-4 border-b px-4">
+            <div
+              className={cn(
+                "items-center gap-4 border-b px-4",
+                inspectorOpen ? "flex" : "hidden",
+                "lg:flex",
+              )}
+            >
               {INSPECTOR_TABS.map((t) => (
                 <button
                   key={t.id}
@@ -346,7 +374,13 @@ export default function ResultPage() {
               ))}
             </div>
 
-            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
+            <div
+              className={cn(
+                "min-h-0 flex-1 space-y-4 overflow-y-auto p-4",
+                inspectorOpen ? "block" : "hidden",
+                "lg:block",
+              )}
+            >
               {tab === "overview" && (
                 <>
                   <AiAnalysis
@@ -726,8 +760,8 @@ function NodesView({
   return (
     <div className="h-full overflow-auto p-6">
       <h1 className="mb-4 font-display text-xl font-bold">Nodes</h1>
-      <div className="overflow-hidden rounded-lg border">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto rounded-lg border">
+        <table className="w-full min-w-[640px] text-sm">
           <thead className="bg-muted/50">
             <tr className="text-left text-xs uppercase text-muted-foreground">
               <th className="px-4 py-2">Status</th>
