@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/shared/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
+// Body / data text
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+// Headlines (sharp contemporary grotesque)
+const display = Hanken_Grotesk({ subsets: ["latin"], variable: "--font-display", display: "swap" });
+// Labels, IPs, code-like data
+const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
   title: "NetTopo AI -- AI Network Topology & Planner",
@@ -18,8 +22,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <body className={`${inter.variable} ${mono.variable} font-sans antialiased`}>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <body
+          className={`${inter.variable} ${display.variable} ${mono.variable} font-sans antialiased`}
+        >
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
             {children}
             <Toaster richColors position="top-center" />
           </ThemeProvider>

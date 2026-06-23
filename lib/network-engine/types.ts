@@ -1,4 +1,20 @@
-export type DeviceType = "ROUTER" | "SWITCH" | "SERVER" | "PC" | "FIREWALL" | "AP";
+// Core device roles the engine understands.
+// NOTE: keep this in sync with prisma `enum DeviceType` and the zod
+// `deviceTypeSchema` in lib/validators/schemas.ts.
+export type DeviceType =
+  | "ROUTER"
+  | "SWITCH"
+  | "SERVER"
+  | "PC"
+  | "FIREWALL"
+  | "AP"
+  | "PRINTER"
+  | "CAMERA"
+  | "NVR"
+  | "IP_PHONE";
+
+// Cable types shown on the diagram and used in the Cisco wiring guide.
+export type CableType = "Straight-through" | "Crossover" | "Serial" | "Console" | "Fiber";
 
 export interface Device {
   id: string;
@@ -11,7 +27,8 @@ export interface Connection {
   id: string;
   from: string;
   to: string;
-  meta?: Record<string, unknown>;
+  // meta.cableType holds the recommended cable for this link.
+  meta?: { cableType?: CableType } & Record<string, unknown>;
 }
 
 export interface Subnet { name: string; cidr: string; mask: string; range: string; }

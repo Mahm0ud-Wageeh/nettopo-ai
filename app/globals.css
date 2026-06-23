@@ -2,50 +2,128 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  NetTopo AI design system (two themes):
+  - Light: "Layered White" (Notion/Linear inspired) - primary #2563EB, accent cyan #06B6D4
+  - Dark:  "Cyber-Precision" deep space - bg #020617, primary #3B82F6, accent cyan #22D3EE
+  Colors are stored as HSL channels so Tailwind tokens can apply opacity.
+*/
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --foreground: 228 17% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 228 17% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 228 17% 12%;
     --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 98%;
+    --secondary-foreground: 228 17% 12%;
     --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 190 90% 63%;
-    --accent-foreground: 222 47% 11%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --muted-foreground: 215 19% 35%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 221 83% 53%;
+    --cyan: 189 94% 43%;
+    --cyan-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
     --border: 214 32% 91%;
     --input: 214 32% 91%;
     --ring: 221 83% 53%;
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
   .dark {
-    --background: 222 47% 7%;
-    --foreground: 210 40% 98%;
-    --card: 222 44% 10%;
-    --card-foreground: 210 40% 98%;
-    --primary: 221 83% 60%;
-    --primary-foreground: 210 40% 98%;
+    --background: 229 84% 5%;
+    --foreground: 213 60% 90%;
+    --card: 222 39% 11%;
+    --card-foreground: 213 60% 90%;
+    --popover: 222 44% 9%;
+    --popover-foreground: 213 60% 90%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary-foreground: 213 60% 90%;
     --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 262 83% 61%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 221 83% 60%;
+    --muted-foreground: 215 20% 72%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 188 86% 53%;
+    --cyan: 188 86% 53%;
+    --cyan-foreground: 222 47% 11%;
+    --destructive: 0 75% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 217 91% 60%;
   }
 }
 
 @layer base {
-  * { @apply border-border; }
-  body { @apply bg-background text-foreground; }
-  html[dir="rtl"] { direction: rtl; }
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv01";
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+  html[dir="rtl"] {
+    direction: rtl;
+  }
+
+  /* Thin "cyber" scrollbars (track = border, thumb = primary) */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.6) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.5);
+    border-radius: 9999px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.8);
+  }
+}
+
+@layer components {
+  /* Subtle 32px engineering grid for hero / workspace backgrounds. */
+  .cyber-grid {
+    background-image:
+      linear-gradient(to right, hsl(var(--border) / 0.5) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.5) 1px, transparent 1px);
+    background-size: 32px 32px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 60%, transparent 100%);
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 60%, transparent 100%);
+  }
+
+  /* Ambient brand glow used behind hero headings and key modules. */
+  .brand-glow {
+    background: radial-gradient(
+      ellipse 60% 50% at 50% 0%,
+      hsl(var(--primary) / 0.18),
+      transparent 70%
+    );
+  }
+
+  /* Elevated surface: soft ambient shadow in light, luminous edge in dark. */
+  .surface-elevated {
+    @apply border bg-card;
+    box-shadow: 0 1px 2px hsl(220 43% 11% / 0.06), 0 4px 12px hsl(220 43% 11% / 0.04);
+  }
+  .dark .surface-elevated {
+    box-shadow: inset 0 1px 0 0 hsl(var(--primary) / 0.08), 0 0 0 1px hsl(var(--border) / 0.6);
+  }
+
+  /* Marks a region as AI-driven: cyan left accent + faint gradient. */
+  .ai-zone {
+    border-left: 2px solid hsl(var(--cyan));
+    background: linear-gradient(90deg, hsl(var(--cyan) / 0.06), transparent 60%);
+  }
 }

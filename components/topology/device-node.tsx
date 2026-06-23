@@ -1,25 +1,69 @@
 "use client";
 import { Handle, Position } from "reactflow";
-import { Router, Network, Server, Monitor, Shield, Wifi } from "lucide-react";
+import {
+  Router,
+  Network,
+  Server,
+  Monitor,
+  Shield,
+  Wifi,
+  Printer,
+  Camera,
+  Video,
+  Phone,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { DeviceType } from "@/lib/network-engine/types";
 
 const ICONS: Record<DeviceType, typeof Router> = {
-  ROUTER: Router, SWITCH: Network, SERVER: Server, PC: Monitor, FIREWALL: Shield, AP: Wifi,
+  ROUTER: Router,
+  SWITCH: Network,
+  SERVER: Server,
+  PC: Monitor,
+  FIREWALL: Shield,
+  AP: Wifi,
+  PRINTER: Printer,
+  CAMERA: Camera,
+  NVR: Video,
+  IP_PHONE: Phone,
 };
 const COLORS: Record<DeviceType, string> = {
-  ROUTER: "bg-blue-500", SWITCH: "bg-emerald-500", SERVER: "bg-violet-500",
-  PC: "bg-slate-500", FIREWALL: "bg-red-500", AP: "bg-amber-500",
+  ROUTER: "bg-blue-500",
+  SWITCH: "bg-emerald-500",
+  SERVER: "bg-violet-500",
+  PC: "bg-slate-500",
+  FIREWALL: "bg-red-500",
+  AP: "bg-amber-500",
+  PRINTER: "bg-cyan-600",
+  CAMERA: "bg-pink-600",
+  NVR: "bg-fuchsia-700",
+  IP_PHONE: "bg-teal-600",
 };
 
-export function DeviceNode({ data }: { data: { label: string; type: DeviceType } }) {
-  const Icon = ICONS[data.type];
+export function DeviceNode({
+  data,
+}: {
+  data: { label: string; type: DeviceType; selected?: boolean };
+}) {
+  const Icon = ICONS[data.type] ?? Monitor;
+  const color = COLORS[data.type] ?? "bg-slate-500";
   return (
     <div className="flex flex-col items-center gap-1">
       <Handle type="target" position={Position.Top} className="!bg-muted-foreground" />
-      <div className={`grid h-12 w-12 place-items-center rounded-xl text-white shadow ${COLORS[data.type]}`}>
+      <div
+        className={cn(
+          "relative grid h-12 w-12 place-items-center rounded-xl text-white shadow transition-all",
+          color,
+          data.selected &&
+            "scale-110 ring-2 ring-primary ring-offset-2 ring-offset-background",
+        )}
+      >
         <Icon className="h-6 w-6" />
+        <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-background bg-emerald-400" />
       </div>
-      <span className="text-xs font-medium">{data.label}</span>
+      <span className={cn("text-xs font-medium", data.selected && "text-primary")}>
+        {data.label}
+      </span>
       <Handle type="source" position={Position.Bottom} className="!bg-muted-foreground" />
     </div>
   );
