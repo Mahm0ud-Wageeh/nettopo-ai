@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@clerk/nextjs";
 
 const EXAMPLES: { label: string; prompt: string }[] = [
   {
@@ -51,10 +52,20 @@ const capacityBars = ["h-10", "h-16", "h-9", "h-24", "h-32", "h-20", "h-12"];
 
 export default function LandingPage() {
   const router = useRouter();
+  const { isLoaded, isSignedIn } = useAuth();
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Gate guests: the first interaction sends them to sign in first.
+  function requireAuth() {
+    if (!isLoaded) return false;
+    if (isSignedIn) return true;
+    router.push("/sign-in");
+    return false;
+  }
+
   async function generate() {
+    if (!requireAuth()) return;
     if (text.trim().length < 2) {
       toast.error("Describe your network first, or pick an example below.");
       return;
@@ -84,8 +95,14 @@ export default function LandingPage() {
       <main className="flex-1">
         {/* ---------------- HERO ---------------- */}
         <section className="relative overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 cyber-grid" aria-hidden />
-          <div className="pointer-events-none absolute inset-0 brand-glow" aria-hidden />
+          <div
+            className="pointer-events-none absolute inset-0 cyber-grid"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute inset-0 brand-glow"
+            aria-hidden
+          />
 
           <div className="container relative flex flex-col items-center py-20 text-center sm:py-28">
             <motion.div {...fadeUp(0)}>
@@ -109,9 +126,9 @@ export default function LandingPage() {
               {...fadeUp(0.1)}
               className="mt-5 max-w-2xl text-lg text-muted-foreground"
             >
-              Describe your ideal network architecture or upload an existing diagram. Our core
-              engine instantly generates detailed, deployable Cisco CLI configurations and visual
-              topologies.
+              Describe your ideal network architecture or upload an existing
+              diagram. Our core engine instantly generates detailed, deployable
+              Cisco CLI configurations and visual topologies.
             </motion.p>
 
             {/* Prompt box */}
@@ -122,17 +139,30 @@ export default function LandingPage() {
                     rows={3}
                     dir="auto"
                     value={text}
-                    onChange={(e) => setText(e.target.value)}
+                    onFocus={() => requireAuth()}
+                    onChange={(e) => {
+                      if (!requireAuth()) return;
+                      setText(e.target.value);
+                    }}
                     placeholder="E.g., Design a high-availability spine-leaf data center fabric with BGP EVPN for 4 server racks..."
                     className="resize-none border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
                   />
                   <div className="mt-2 flex items-center justify-between gap-3">
-                    <Button asChild variant="outline" size="sm" className="gap-2">
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                    >
                       <Link href="/upload">
                         <Upload className="h-4 w-4" /> Upload Topology Image
                       </Link>
                     </Button>
-                    <Button onClick={generate} disabled={loading} className="gap-2">
+                    <Button
+                      onClick={generate}
+                      disabled={loading}
+                      className="gap-2"
+                    >
                       {loading ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
@@ -150,7 +180,10 @@ export default function LandingPage() {
                   <button
                     key={ex.label}
                     type="button"
-                    onClick={() => setText(ex.prompt)}
+                    onClick={() => {
+                      if (!requireAuth()) return;
+                      setText(ex.prompt);
+                    }}
                     className="rounded-full border bg-background/60 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
                   >
                     Try: {ex.label}
@@ -170,10 +203,12 @@ export default function LandingPage() {
                 <span className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
                   <Sparkles className="h-5 w-5" />
                 </span>
-                <CardTitle className="mt-3 text-xl">AI Diagram Generation</CardTitle>
+                <CardTitle className="mt-3 text-xl">
+                  AI Diagram Generation
+                </CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Instantly convert natural language prompts into precise, editable visual
-                  topologies mapped to industry standard icons.
+                  Instantly convert natural language prompts into precise,
+                  editable visual topologies mapped to industry standard icons.
                 </p>
               </CardHeader>
               <CardContent>
@@ -193,19 +228,22 @@ export default function LandingPage() {
                 </span>
                 <CardTitle className="mt-3 text-xl">Full Cisco CLI</CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Export production-ready configuration scripts perfectly tuned for Cisco IOS,
-                  NX-OS, or general vendor-neutral YAML.
+                  Export production-ready configuration scripts perfectly tuned
+                  for Cisco IOS, NX-OS, or general vendor-neutral YAML.
                 </p>
               </CardHeader>
               <CardContent>
                 <pre className="overflow-x-auto rounded-lg bg-slate-950 p-4 font-mono text-xs leading-relaxed text-slate-300">
                   <code>
-                    <span className="text-slate-500">! Generated by NetTopo AI</span>
+                    <span className="text-slate-500">
+                      ! Generated by NetTopo AI
+                    </span>
                     {"\n"}
                     <span className="text-primary">router bgp</span> 65001{"\n"}
                     {"  "}bgp router-id 10.0.0.1{"\n"}
                     {"  "}
-                    <span className="text-cyan">neighbor</span> 10.0.0.2 remote-as 65002{"\n"}
+                    <span className="text-cyan">neighbor</span> 10.0.0.2
+                    remote-as 65002{"\n"}
                     {"  "}...
                   </code>
                 </pre>
@@ -222,8 +260,8 @@ export default function LandingPage() {
                 </span>
                 <CardTitle className="mt-3 text-xl">Whiteboard OCR</CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Upload photos of hand-drawn diagrams. Our vision model parses shapes and text to
-                  digitize your brainstorms instantly.
+                  Upload photos of hand-drawn diagrams. Our vision model parses
+                  shapes and text to digitize your brainstorms instantly.
                 </p>
               </CardHeader>
             </Card>
@@ -236,10 +274,12 @@ export default function LandingPage() {
                 <span className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
                   <BarChart3 className="h-5 w-5" />
                 </span>
-                <CardTitle className="mt-3 text-xl">Smart Capacity Planning</CardTitle>
+                <CardTitle className="mt-3 text-xl">
+                  Smart Capacity Planning
+                </CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Predict bandwidth bottlenecks and validate redundancy paths before deployment
-                  using integrated simulation heuristics.
+                  Predict bandwidth bottlenecks and validate redundancy paths
+                  before deployment using integrated simulation heuristics.
                 </p>
               </CardHeader>
               <CardContent>
